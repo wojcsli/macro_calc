@@ -1,12 +1,15 @@
 package com.wojciechsliz.macrocalc.datamodel;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Datasource {
     public static final String DB_NAME = "foods.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:D:\\JavaLearning\\MacroCalc\\" + DB_NAME;
+    public static final String CONNECTION_STRING = "jdbc:sqlite:D:\\Projekty\\MacroCalc\\" + DB_NAME;
 
     public static final String TABLE_FOOD = "food";
     public static final String COLUMN_FOOD_ID = "_id";
@@ -59,16 +62,23 @@ public class Datasource {
 
     private static Datasource instance = new Datasource();
 
+    private ObservableList<Meal> meals;
+
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
             queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS);
             addMealStatement = connection.prepareStatement(ADD_MEAL_STRING, Statement.RETURN_GENERATED_KEYS);
+            meals = FXCollections.observableArrayList(queryMeals());
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public ObservableList<Meal> getMeals() {
+        return meals;
     }
 
     public List<Meal> queryMeals() {
@@ -139,20 +149,21 @@ public class Datasource {
         }
     }
 
-    public int addMeal(String name) {
+    public boolean addMeal(String name) {
         if (!name.isEmpty()) {
             try {
                 addMealStatement.setString(1, name);
                 addMealStatement.executeUpdate();
                 ResultSet generatedKey = addMealStatement.getGeneratedKeys();
-                return generatedKey.getInt(1);
+                meals.add(new Meal(name, generatedKey.getInt(1)));
+                return true;
             } catch (SQLException e) {
                 e.printStackTrace();
-                return -1;
+                return false;
             }
         }
         System.out.println("enter valid description");
-        return -1;
+        return false;
     }
 
 }

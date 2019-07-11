@@ -13,7 +13,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("mainwindow.fxml"));
         primaryStage.setTitle("MacroCalc");
-        primaryStage.setScene(new Scene(root, 540, 370));
+        primaryStage.setScene(new Scene(root, 635, 370));
         primaryStage.show();
     }
 

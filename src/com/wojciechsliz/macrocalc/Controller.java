@@ -10,9 +10,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import top.jalva.jalvafx.node.ComboBoxCustomizer;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.Optional;
 
 public class Controller {
@@ -36,12 +35,10 @@ public class Controller {
     private TableColumn columnKcal;
 
     @FXML
-    private TableView mealIngredientsTable;
+    private TableView<Meal> mealIngredientsTable;
 
     @FXML
     private ListView<Meal> mealList;
-
-    private ObservableList<Meal> meals = FXCollections.observableArrayList(Datasource.getInstance().queryMeals());
 
     @FXML
     public void initialize() {
@@ -49,7 +46,6 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends Meal> observableValue, Meal oldMeal, Meal newValue) {
                 if (newValue!= null) {
-                    Meal meal = mealList.getSelectionModel().getSelectedItem();
                     GetAllMealsTask task = new GetAllMealsTask(newValue);
 
                     mealIngredientsTable.itemsProperty().bind(task.valueProperty());
@@ -58,7 +54,7 @@ public class Controller {
                 }
             }
         });
-        mealList.setItems(meals);
+        mealList.setItems(Datasource.getInstance().getMeals());
         mealList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         mealList.getSelectionModel().selectFirst();
 
@@ -74,12 +70,8 @@ public class Controller {
 // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            int key = Datasource.getInstance().addMeal(result.get());
-            meals.add(new Meal(result.get(), key));
+            Datasource.getInstance().addMeal(result.get());
             mealList.getSelectionModel().selectLast();
-
-
-
         }
     }
 }
