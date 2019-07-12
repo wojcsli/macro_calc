@@ -5,7 +5,7 @@ module MacroCalc {
         requires sqlite.jdbc;
         requires java.sql;
         requires javafx.swt;
-        requires jalvafx;
+        requires org.controlsfx.controls;
 
         opens com.wojciechsliz.macrocalc;
         opens com.wojciechsliz.macrocalc.datamodel;

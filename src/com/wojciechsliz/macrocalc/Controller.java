@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import top.jalva.jalvafx.node.ComboBoxCustomizer;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -85,6 +84,11 @@ public class Controller {
 
         Optional<ButtonType> result = dialog.showAndWait();
         if(result.isPresent() && result.get() == ButtonType.OK) {
+            Meal meal = mealList.getSelectionModel().getSelectedItem();
+            Ingredient ingredient = controller.processInput();
+            meal.addIngredient(ingredient);
+            meal.updateMacros();
+            System.out.println(meal.getCarbohydrateContent());
 
 
         }

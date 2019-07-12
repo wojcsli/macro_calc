@@ -46,6 +46,10 @@ public class Meal {
         this.ingredients = ingredients;
     }
 
+    public void addIngredient(Ingredient ingredient){
+        ingredients.add(ingredient);
+    }
+
     public int getId() {
         return id.get();
     }
@@ -148,7 +152,7 @@ public class Meal {
         this.kiloCalories.set(totalKcal);
     }
 
-    private void updateMacros(){
+    public void updateMacros(){
         updateWeight();
         updateCarbs();
         updateFatContent();
