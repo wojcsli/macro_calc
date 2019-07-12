@@ -16,36 +16,36 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="473.0" prefWidth="540.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
+<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml" fx:controller="com.wojciechsliz.macrocalc.Controller">
    <center>
-      <TableView fx:id="mealIngredientsTable" prefHeight="360.0" prefWidth="271.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="mealIngredientsTable" prefHeight="392.0" prefWidth="350.0" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn fx:id="columnName" text="description">
+          <TableColumn fx:id="columnName" editable="false" prefWidth="165.0" text="description">
               <cellValueFactory>
                   <PropertyValueFactory property="name" />
               </cellValueFactory>
           </TableColumn>
-          <TableColumn fx:id="columnWeight" text="weight">
+          <TableColumn fx:id="columnWeight" prefWidth="55.0" text="weight">
               <cellValueFactory>
                   <PropertyValueFactory property="weight" />
               </cellValueFactory>
           </TableColumn>
-          <TableColumn fx:id="columnCarb" text="carb">
+          <TableColumn fx:id="columnCarb" prefWidth="55.0" text="carb">
               <cellValueFactory>
                   <PropertyValueFactory property="carb" />
               </cellValueFactory>
           </TableColumn>
-          <TableColumn fx:id="columnProtein" text="protein">
+          <TableColumn fx:id="columnProtein" prefWidth="55.0" text="protein">
               <cellValueFactory>
                   <PropertyValueFactory property="protein" />
               </cellValueFactory>
           </TableColumn>
-          <TableColumn fx:id="columnFat" text="fat">
+          <TableColumn fx:id="columnFat" prefWidth="55.0" text="fat">
               <cellValueFactory>
                   <PropertyValueFactory property="fat" />
               </cellValueFactory>
           </TableColumn>
-          <TableColumn fx:id="columnKcal" text="kcal">
+          <TableColumn fx:id="columnKcal" prefWidth="55.0" text="kcal">
               <cellValueFactory>
                   <PropertyValueFactory property="kcal" />
               </cellValueFactory>
@@ -78,9 +78,9 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <SplitPane dividerPositions="0.3513011152416357" prefHeight="38.0" prefWidth="540.0">
+            <SplitPane dividerPositions="0.30173775671406006" prefHeight="38.0" prefWidth="540.0">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="23.0" prefWidth="209.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="29.0" prefWidth="202.0">
                      <children>
                         <HBox layoutY="-1.0" prefHeight="47.0" prefWidth="188.0">
                            <children>
@@ -106,10 +106,11 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="95.0" text="Add meal" onAction="#handleMealAdd" />
-                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="95.0" text="Remove meal" />
+                  <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="100.0" text="Add meal" />
+                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Remove meal" />
                </children>
             </HBox>
+            <Button mnemonicParsing="false" text="Add ingredient" onAction="#handleMealIngredientAdd" />
          </children>
       </HBox>
    </bottom>

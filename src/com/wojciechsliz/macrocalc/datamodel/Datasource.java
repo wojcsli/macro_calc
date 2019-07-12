@@ -56,13 +56,18 @@ public class Datasource {
     private PreparedStatement queryMealIngredients;
     private PreparedStatement addMealStatement;
 
+    private static Datasource instance = new Datasource();
+
     public static Datasource getInstance() {
         return instance;
     }
 
-    private static Datasource instance = new Datasource();
+
 
     private ObservableList<Meal> meals;
+
+    private Datasource(){
+    }
 
     public boolean open() {
         try {
@@ -164,6 +169,10 @@ public class Datasource {
         }
         System.out.println("enter valid description");
         return false;
+    }
+
+    public boolean addMealIngredient(Meal meal) {
+        return true;
     }
 
 }

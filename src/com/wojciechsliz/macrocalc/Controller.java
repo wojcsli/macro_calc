@@ -1,44 +1,32 @@
 package com.wojciechsliz.macrocalc;
 
 import com.wojciechsliz.macrocalc.datamodel.Datasource;
+import com.wojciechsliz.macrocalc.datamodel.Ingredient;
 import com.wojciechsliz.macrocalc.datamodel.Meal;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import top.jalva.jalvafx.node.ComboBoxCustomizer;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public class Controller {
 
     @FXML
-    private TableColumn columnName;
-
-    @FXML
-    private TableColumn columnWeight;
-
-    @FXML
-    private TableColumn columnCarb;
-
-    @FXML
-    private TableColumn columnProtein;
-
-    @FXML
-    private TableColumn columnFat;
-
-    @FXML
-    private TableColumn columnKcal;
+    BorderPane mainBorderPane;
 
     @FXML
     private TableView<Meal> mealIngredientsTable;
 
     @FXML
     private ListView<Meal> mealList;
+
 
     @FXML
     public void initialize() {
@@ -61,8 +49,8 @@ public class Controller {
 
     }
 
-
-    public void handleMealAdd(ActionEvent actionEvent) {
+    @FXML
+    public void handleMealAdd() {
         TextInputDialog dialog = new TextInputDialog("walter");
         dialog.setTitle("New meal");
         dialog.setHeaderText("Enter description of your meal");
@@ -73,6 +61,34 @@ public class Controller {
             Datasource.getInstance().addMeal(result.get());
             mealList.getSelectionModel().selectLast();
         }
+    }
+
+    @FXML
+    public void handleMealIngredientAdd() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.initOwner(mainBorderPane.getScene().getWindow());
+        dialog.setTitle("Add New Todo Item");
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("addToMealDialog.fxml"));
+        try {
+            dialog.getDialogPane().setContent(fxmlLoader.load());
+
+        } catch(IOException e) {
+            System.out.println("Couldn't load the dialog");
+            System.out.println(e.getMessage());
+            return;
+        }
+        DialogController controller = fxmlLoader.getController();
+        controller.setUpComboBox();
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if(result.isPresent() && result.get() == ButtonType.OK) {
+
+
+        }
+
     }
 }
 

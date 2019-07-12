@@ -63,4 +63,10 @@ public class Ingredient {
     public void setKcal(double kcal) {
         this.kcal.set(kcal);
     }
+
+    @Override
+    public String toString() {
+        return name.getValue();
+
+    }
 }

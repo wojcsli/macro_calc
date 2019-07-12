@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
+<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml" fx:controller="com.wojciechsliz.macrocalc.Controller">
    <center>
       <TableView fx:id="mealIngredientsTable" prefHeight="392.0" prefWidth="350.0" BorderPane.alignment="CENTER">
         <columns>
@@ -110,6 +110,7 @@
                   <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Remove meal" />
                </children>
             </HBox>
+            <Button mnemonicParsing="false" text="Add ingredient" onAction="#handleMealIngredientAdd" />
          </children>
       </HBox>
    </bottom>
