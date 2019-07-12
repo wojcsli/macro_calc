@@ -8,24 +8,24 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<DialogPane prefHeight="200" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml" fx:controller="com.wojciechsliz.macrocalc.DialogController">
+<DialogPane prefHeight="200" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.DialogController">
     <content>
         <GridPane hgap="10" prefWidth="600.0" vgap="10">
             <Label text="weight:" GridPane.rowIndex="1" />
             <TextField fx:id="weightField" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <ComboBox fx:id="pickIngredientComboBox" prefHeight="25.0" prefWidth="480.0" GridPane.columnIndex="2" />
              <Label text="Ingredient:" />
-            <columnConstraints>
-                <ColumnConstraints />
-                <ColumnConstraints />
-                <ColumnConstraints />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints />
-                <RowConstraints />
-                <RowConstraints />
-                <RowConstraints />
-            </rowConstraints>
-        </GridPane>
+             <ComboBox fx:id="pickIngredientComboBox" prefHeight="25.0" prefWidth="498.0" GridPane.columnIndex="2" />
+                <columnConstraints>
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
     </content>
 </DialogPane>

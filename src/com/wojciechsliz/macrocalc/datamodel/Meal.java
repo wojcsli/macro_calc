@@ -47,8 +47,13 @@ public class Meal {
     }
 
     public void addIngredient(Ingredient ingredient){
-        ingredients.add(ingredient);
+        if (ingredient!=null){
+            ingredients.add(ingredient);
+        } else {
+            System.out.println("null ingredient");
+        }
     }
+
 
     public int getId() {
         return id.get();

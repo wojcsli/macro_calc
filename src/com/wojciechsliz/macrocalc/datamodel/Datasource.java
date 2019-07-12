@@ -40,6 +40,8 @@ public class Datasource {
 
     public static final String QUERY_INGREDIENTS = "SELECT * FROM " + TABLE_FOOD;
 
+    public static final String QUERY_INGREDIENT = "SELECT * FROM " + TABLE_FOOD + " WHERE " + COLUMN_FOOD_NAME + "= ?";
+
     public static final String QUERY_MEALS = "SELECT * FROM " + TABLE_MEAL;
 
     public static final String QUERY_MEAL_INGREDIENTS = "SELECT " + TABLE_FOOD + "." + COLUMN_FOOD_NAME + ", " +
@@ -51,10 +53,16 @@ public class Datasource {
 
     public static final String ADD_MEAL_STRING = "INSERT INTO " + TABLE_MEAL + " (" + COLUMN_MEAL_NAME + ") VALUES (?)";
 
+    public static final String ADD_MEAL_INGREDIENT_STRING ="INSERT INTO " + TABLE_MEAL_INGREDIENT + " (" + COLUMN_MEAL_INGREDIENT_MEAL_ID + ", " +
+            COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + ", " + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + COLUMN_MEAL_INGREDIENT_CARB + ", " +
+            COLUMN_MEAL_INGREDIENT_PROTEIN + ", " + COLUMN_MEAL_INGREDIENT_FAT + ", " + COLUMN_MEAL_INGREDIENT_KCAL + ") VALUES (?, ?, ?, ?, ?, ?, ?)" ;
+
     private Connection connection;
 
+    private PreparedStatement addMealIngredientStatement;
     private PreparedStatement queryMealIngredients;
     private PreparedStatement addMealStatement;
+    private PreparedStatement queryIngredientStatement;
 
     private static Datasource instance = new Datasource();
 
@@ -69,11 +77,17 @@ public class Datasource {
     private Datasource(){
     }
 
+    public ObservableList<Meal> getMeals() {
+        return meals;
+    }
+
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
             queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS);
+            queryIngredientStatement = connection.prepareStatement(QUERY_INGREDIENT);
             addMealStatement = connection.prepareStatement(ADD_MEAL_STRING, Statement.RETURN_GENERATED_KEYS);
+            addMealIngredientStatement = connection.prepareStatement(ADD_MEAL_INGREDIENT_STRING);
             meals = FXCollections.observableArrayList(queryMeals());
             return true;
         } catch (SQLException e) {
@@ -82,9 +96,7 @@ public class Datasource {
         return false;
     }
 
-    public ObservableList<Meal> getMeals() {
-        return meals;
-    }
+
 
     public List<Meal> queryMeals() {
         List<Meal> meals = new ArrayList<>();
@@ -109,6 +121,7 @@ public class Datasource {
 
 
     }
+
 
     public List<Ingredient> queryIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
@@ -171,8 +184,25 @@ public class Datasource {
         return false;
     }
 
-    public boolean addMealIngredient(Meal meal) {
-        return true;
+    public boolean addMealIngredient(Meal meal, Ingredient ingredient) {
+
+        try {
+            queryIngredientStatement.setString(1,ingredient.getName());
+            ResultSet resultSet = queryIngredientStatement.executeQuery();
+            addMealIngredientStatement.setString(1,String.valueOf(meal.getId()));
+            addMealIngredientStatement.setString(2,String.valueOf(resultSet.getInt(COLUMN_FOOD_ID)));
+            addMealIngredientStatement.setString(3,String.valueOf(ingredient.getWeight()));
+            addMealIngredientStatement.setString(4,String.valueOf(resultSet.getDouble(COLUMN_FOOD_CARB)));
+            addMealIngredientStatement.setString(5,String.valueOf(resultSet.getDouble(COLUMN_FOOD_PROTEIN)));
+            addMealIngredientStatement.setString(6,String.valueOf(resultSet.getDouble(COLUMN_FOOD_FAT)));
+            addMealIngredientStatement.setString(7,String.valueOf(resultSet.getDouble(COLUMN_FOOD_KCAL)));
+            addMealIngredientStatement.executeUpdate();
+            //String addIngredient = ("INSERT INTO " + TABLE_MEAL_INGREDIENT + " (meal_id, ingredient_id, weight, carb, protein, fat, kcal) VALUES (" + meal.getId() + ", 4, 20, 20, 20, 20, 200)");
+            return true;
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+                return false;
+            }
+        }
     }
 
-}

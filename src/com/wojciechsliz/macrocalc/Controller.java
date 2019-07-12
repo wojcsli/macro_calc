@@ -86,13 +86,16 @@ public class Controller {
         if(result.isPresent() && result.get() == ButtonType.OK) {
             Meal meal = mealList.getSelectionModel().getSelectedItem();
             Ingredient ingredient = controller.processInput();
-            meal.addIngredient(ingredient);
-            meal.updateMacros();
-            System.out.println(meal.getCarbohydrateContent());
-
+            Datasource.getInstance().addMealIngredient(meal, ingredient);
+            refreshMealList();
 
         }
+    }
 
+    private void refreshMealList() {
+        Meal m = mealList.getSelectionModel().getSelectedItem();
+        mealList.getSelectionModel().clearSelection();
+        mealList.getSelectionModel().select(m);
     }
 }
 
