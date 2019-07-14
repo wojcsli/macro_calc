@@ -2,9 +2,12 @@ package com.wojciechsliz.macrocalc.datamodel;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.time.LocalDate;
 
 public class Meal {
     private ObservableList<Ingredient> ingredients;
@@ -16,6 +19,7 @@ public class Meal {
     private SimpleDoubleProperty proteinContent = new SimpleDoubleProperty();
     private SimpleDoubleProperty carbohydrateContent = new SimpleDoubleProperty();
     private SimpleDoubleProperty kiloCalories = new SimpleDoubleProperty();
+    private SimpleObjectProperty<LocalDate> date = new SimpleObjectProperty<>(this, "date");
 
     public Meal() {
     }
@@ -37,6 +41,15 @@ public class Meal {
         this.proteinContent.setValue(0);
         this.carbohydrateContent.setValue(0);
         this.kiloCalories.setValue(0);
+    }
+
+
+    public LocalDate getDate() {
+        return date.get();
+    }
+
+    public void setDate(LocalDate date) {
+        this.date.set(date);
     }
 
     public ObservableList<Ingredient> getIngredients() {

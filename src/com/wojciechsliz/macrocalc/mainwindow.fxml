@@ -84,9 +84,9 @@
                      <children>
                         <HBox layoutY="-1.0" prefHeight="47.0" prefWidth="188.0">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="Button" />
-                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="Button" />
-                              <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="102.0" />
+                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="&lt;--" onAction="#handlePreviousDayButton"/>
+                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="--&gt;" onAction="#handleNextDayButton"/>
+                              <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="102.0" onAction="#handleDateChange" />
                            </children>
                         </HBox>
                      </children>

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Datasource {
 
     public static final String TABLE_MEAL = "meal";
     public static final String COLUMN_MEAL_ID = "_id";
+    public static final String COLUMN_MEAL_DAY = "nutrition_day";
     public static final String COLUMN_MEAL_NAME = "name";
     public static final String COLUMN_MEAL_CARB = "carb";
     public static final String COLUMN_MEAL_PROTEIN = "protein";
@@ -36,14 +38,13 @@ public class Datasource {
     public static final String COLUMN_MEAL_INGREDIENT_FAT = "fat";
     public static final String COLUMN_MEAL_INGREDIENT_KCAL = "kcal";
 
-
-
-
     public static final String QUERY_INGREDIENTS = "SELECT * FROM " + TABLE_FOOD;
 
     public static final String QUERY_INGREDIENT = "SELECT * FROM " + TABLE_FOOD + " WHERE " + COLUMN_FOOD_NAME + "= ?";
 
     public static final String QUERY_MEALS = "SELECT * FROM " + TABLE_MEAL;
+
+    public static final String QUERY_MEALS_IN_DAY ="SELECT * FROM " + TABLE_MEAL + " WHERE " + COLUMN_MEAL_DAY + " = ?";
 
     public static final String QUERY_MEAL_INGREDIENTS = "SELECT " + TABLE_FOOD + "." + COLUMN_FOOD_NAME + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_CARB + ", " +
@@ -53,7 +54,7 @@ public class Datasource {
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + " = " + TABLE_FOOD + "." + COLUMN_FOOD_ID + " WHERE " +
             COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ?";
 
-    public static final String ADD_MEAL_STRING = "INSERT INTO " + TABLE_MEAL + " (" + COLUMN_MEAL_NAME + ") VALUES (?)";
+    public static final String ADD_MEAL_STRING = "INSERT INTO " + TABLE_MEAL + " (" + COLUMN_MEAL_NAME + ", " + COLUMN_MEAL_DAY + ") VALUES (?, ?)";
 
     public static final String ADD_MEAL_INGREDIENT_STRING ="INSERT INTO " + TABLE_MEAL_INGREDIENT + " (" + COLUMN_MEAL_INGREDIENT_MEAL_ID + ", " +
             COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + ", " + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + COLUMN_MEAL_INGREDIENT_CARB + ", " +
@@ -74,6 +75,7 @@ public class Datasource {
     private PreparedStatement removeMealStatement;
     private PreparedStatement removeMealIngredientStatement;
     private PreparedStatement removeMealIngredientsStatement;
+    private PreparedStatement queryMealInDayStatement;
 
     private static Datasource instance = new Datasource();
 
@@ -94,6 +96,7 @@ public class Datasource {
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
+            queryMealInDayStatement = connection.prepareStatement(QUERY_MEALS_IN_DAY);
             queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS);
             queryIngredientStatement = connection.prepareStatement(QUERY_INGREDIENT);
             addMealStatement = connection.prepareStatement(ADD_MEAL_STRING, Statement.RETURN_GENERATED_KEYS);
@@ -101,7 +104,7 @@ public class Datasource {
             removeMealStatement = connection.prepareStatement(REMOVE_MEAL_STRING);
             removeMealIngredientStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENT_STRING);
             removeMealIngredientsStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENTS_STRING);
-            meals = FXCollections.observableArrayList(queryMeals());
+            meals = FXCollections.observableArrayList(queryMeals(LocalDate.now()));
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -111,14 +114,16 @@ public class Datasource {
 
 
 
-    public List<Meal> queryMeals() {
-        List<Meal> meals = new ArrayList<>();
-        try (Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(QUERY_MEALS)) {
+    public List<Meal> queryMeals(LocalDate date) {
+        meals = FXCollections.observableArrayList();
+        try  {
+            queryMealInDayStatement.setString(1,date.toString());
+            ResultSet resultSet = queryMealInDayStatement.executeQuery();
 
             while (resultSet.next()) {
                 Meal meal = new Meal();
                 meal.setId(resultSet.getInt(COLUMN_MEAL_ID));
+                meal.setDate(date);
                 meal.setName(resultSet.getString(COLUMN_MEAL_NAME));
                 meal.setCarbohydrateContent(resultSet.getDouble(COLUMN_MEAL_CARB));
                 meal.setProteinContent(resultSet.getDouble(COLUMN_MEAL_PROTEIN));
@@ -182,13 +187,18 @@ public class Datasource {
         }
     }
 
-    public boolean addMeal(String name) {
+    public boolean addMeal(String name, LocalDate date) {
         if (!name.isEmpty()) {
             try {
                 addMealStatement.setString(1, name);
+                addMealStatement.setString(2, date.toString());
                 addMealStatement.executeUpdate();
                 ResultSet generatedKey = addMealStatement.getGeneratedKeys();
-                meals.add(new Meal(name, generatedKey.getInt(1)));
+                Meal meal = new Meal();
+                meal.setDate(date);
+                meal.setName(name);
+                meal.setId(generatedKey.getInt(1));
+                meals.add(meal);
                 return true;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -221,7 +231,7 @@ public class Datasource {
 
             return 1;
             } catch (SQLException e1) {
-                e1.printStackTrace();
+            System.out.println("invalid ingredient");
                 return -2;
             }
         }

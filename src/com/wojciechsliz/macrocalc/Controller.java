@@ -6,6 +6,7 @@ import com.wojciechsliz.macrocalc.datamodel.Meal;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,25 +33,31 @@ public class Controller {
     @FXML
     private ListView<Meal> mealList;
 
-
-    @FXML
-    public void initialize() {
-        initializeMealList();
-
-
-    }
-
-    private void initializeMealList() {
-        mealList.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMeal, newValue) -> {
-            if (newValue!= null) {
+    private ChangeListener<Meal> changeListener = new ChangeListener<Meal>() {
+        @Override
+        public void changed(ObservableValue<? extends Meal> observableValue, Meal oldMeal, Meal newValue) {
+            if (newValue != null) {
                 GetAllMealsTask task = new GetAllMealsTask(newValue);
-
                 mealIngredientsTable.itemsProperty().bind(task.valueProperty());
                 new Thread(task).start();
 
             }
-        });
-        mealList.setItems(Datasource.getInstance().getMeals());
+        }
+    };
+
+
+    @FXML
+    public void initialize() {
+        datePicker.setValue(LocalDate.now());
+        initializeMealList(LocalDate.now());
+
+
+    }
+
+    private void initializeMealList(LocalDate date) {
+        mealList.getSelectionModel().selectedItemProperty().removeListener(changeListener);
+        mealList.getSelectionModel().selectedItemProperty().addListener(changeListener);
+        mealList.setItems((ObservableList<Meal>) Datasource.getInstance().queryMeals(date));
         mealList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         mealList.getSelectionModel().selectFirst();
     }
@@ -64,7 +71,7 @@ public class Controller {
 // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            Datasource.getInstance().addMeal(result.get());
+            Datasource.getInstance().addMeal(result.get(), datePicker.getValue());
             mealList.getSelectionModel().selectLast();
         }
     }
@@ -137,6 +144,24 @@ public class Controller {
         alert.setTitle("Error ");
         alert.setContentText(errorMessage);
         alert.showAndWait();
+    }
+
+    public void handleDateChange(ActionEvent actionEvent) {
+        initializeMealList(datePicker.getValue());
+    }
+
+    public void handlePreviousDayButton(ActionEvent actionEvent) {
+        LocalDate temp = datePicker.getValue();
+        temp = temp.minusDays(1);
+        datePicker.setValue(temp);
+        initializeMealList(temp);
+    }
+
+    public void handleNextDayButton(ActionEvent actionEvent) {
+        LocalDate temp = datePicker.getValue();
+        temp = temp.plusDays(1);
+        datePicker.setValue(temp);
+        initializeMealList(temp);
     }
 }
 
