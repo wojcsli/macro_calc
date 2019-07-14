@@ -1,6 +1,7 @@
 package com.wojciechsliz.macrocalc.datamodel;
 
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Ingredient {
@@ -10,6 +11,8 @@ public class Ingredient {
     private SimpleDoubleProperty protein = new SimpleDoubleProperty();
     private SimpleDoubleProperty carb = new SimpleDoubleProperty();
     private SimpleDoubleProperty kcal = new SimpleDoubleProperty();
+    private SimpleIntegerProperty ingredientId = new SimpleIntegerProperty();
+    private SimpleIntegerProperty mealId = new SimpleIntegerProperty();
 
     public Ingredient() {
     }
@@ -62,6 +65,22 @@ public class Ingredient {
 
     public void setKcal(double kcal) {
         this.kcal.set(kcal);
+    }
+
+    public int getIngredientId() {
+        return ingredientId.get();
+    }
+
+    public void setIngredientId(int ingredientId) {
+        this.ingredientId.set(ingredientId);
+    }
+
+    public int getMealId() {
+        return mealId.get();
+    }
+
+    public void setMealId(int mealId) {
+        this.mealId.set(mealId);
     }
 
     @Override

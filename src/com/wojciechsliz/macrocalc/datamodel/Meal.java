@@ -3,6 +3,7 @@ package com.wojciechsliz.macrocalc.datamodel;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Meal {
@@ -163,6 +164,20 @@ public class Meal {
         updateFatContent();
         updateProteinContent();
         updateCalories();
+    }
+
+    public boolean lookForIngredientWithId(int ingredientId) {
+        ingredients = FXCollections.observableArrayList(Datasource.getInstance().queryMealIngredients(this));
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.getIngredientId() == ingredientId){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeIngredient(Ingredient ingredient) {
+        ingredients.remove(ingredient);
     }
 
     @Override

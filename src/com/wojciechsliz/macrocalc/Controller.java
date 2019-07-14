@@ -7,12 +7,15 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 
 public class Controller {
@@ -21,7 +24,10 @@ public class Controller {
     BorderPane mainBorderPane;
 
     @FXML
-    private TableView<Meal> mealIngredientsTable;
+    DatePicker datePicker;
+
+    @FXML
+    private TableView<Ingredient> mealIngredientsTable;
 
     @FXML
     private ListView<Meal> mealList;
@@ -29,23 +35,24 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        mealList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Meal>() {
-            @Override
-            public void changed(ObservableValue<? extends Meal> observableValue, Meal oldMeal, Meal newValue) {
-                if (newValue!= null) {
-                    GetAllMealsTask task = new GetAllMealsTask(newValue);
+        initializeMealList();
 
-                    mealIngredientsTable.itemsProperty().bind(task.valueProperty());
-                    new Thread(task).start();
 
-                }
+    }
+
+    private void initializeMealList() {
+        mealList.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMeal, newValue) -> {
+            if (newValue!= null) {
+                GetAllMealsTask task = new GetAllMealsTask(newValue);
+
+                mealIngredientsTable.itemsProperty().bind(task.valueProperty());
+                new Thread(task).start();
+
             }
         });
         mealList.setItems(Datasource.getInstance().getMeals());
         mealList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         mealList.getSelectionModel().selectFirst();
-
-
     }
 
     @FXML
@@ -66,7 +73,7 @@ public class Controller {
     public void handleMealIngredientAdd() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(mainBorderPane.getScene().getWindow());
-        dialog.setTitle("Add New Todo Item");
+        dialog.setTitle("Add new ingredient");
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("addToMealDialog.fxml"));
         try {
@@ -86,9 +93,36 @@ public class Controller {
         if(result.isPresent() && result.get() == ButtonType.OK) {
             Meal meal = mealList.getSelectionModel().getSelectedItem();
             Ingredient ingredient = controller.processInput();
-            Datasource.getInstance().addMealIngredient(meal, ingredient);
-            refreshMealList();
+            try {
+                int addMealIngredientResult = Datasource.getInstance().addMealIngredient(meal, ingredient);
+                if (addMealIngredientResult == -1) {
+                    addErrorDialog("Ingredient already exist");
+                } else if (addMealIngredientResult == -2) {
+                    addErrorDialog("Invalid Ingredient");
+                }
+                refreshMealList();
+            } catch (NullPointerException e) {
+                addErrorDialog("Invalid weight");
+            }
 
+        }
+    }
+
+
+
+    public void handleMealRemoval() {
+        Meal meal = mealList.getSelectionModel().getSelectedItem();
+        if (meal != null) {
+            Datasource.getInstance().removeMeal(meal);
+        }
+    }
+
+    public void handleMealIngredientRemoval() {
+        Meal meal = mealList.getSelectionModel().getSelectedItem();
+        Ingredient ingredient = mealIngredientsTable.getSelectionModel().getSelectedItem();
+        if ((meal != null) && (ingredient != null)) {
+            Datasource.getInstance().removeMealIngredient(meal, ingredient);
+            refreshMealList();
         }
     }
 
@@ -96,6 +130,13 @@ public class Controller {
         Meal m = mealList.getSelectionModel().getSelectedItem();
         mealList.getSelectionModel().clearSelection();
         mealList.getSelectionModel().select(m);
+    }
+
+    private void addErrorDialog(String errorMessage) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error ");
+        alert.setContentText(errorMessage);
+        alert.showAndWait();
     }
 }
 

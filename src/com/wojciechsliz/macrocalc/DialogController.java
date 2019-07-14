@@ -28,7 +28,13 @@ public class DialogController {
         System.out.println(string);
         Ingredient ingredient = new Ingredient();
         ingredient.setName(string);
-        ingredient.setWeight(Integer.parseInt(weightField.getText()));
+        try {
+            ingredient.setWeight(Integer.parseInt(weightField.getText()));
+        } catch (NumberFormatException e) {
+            System.out.println("invalid weight");
+            return null;
+        }
+
 
         return ingredient;
 

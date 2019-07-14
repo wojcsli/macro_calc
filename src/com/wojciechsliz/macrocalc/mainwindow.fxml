@@ -16,11 +16,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml" fx:controller="com.wojciechsliz.macrocalc.Controller">
+<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
    <center>
       <TableView fx:id="mealIngredientsTable" prefHeight="392.0" prefWidth="350.0" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn fx:id="columnName" editable="false" prefWidth="165.0" text="description">
+          <TableColumn fx:id="columnName" editable="false" prefWidth="165.0" text="Ingredient">
               <cellValueFactory>
                   <PropertyValueFactory property="name" />
               </cellValueFactory>
@@ -86,7 +86,7 @@
                            <children>
                               <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="Button" />
                               <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="Button" />
-                              <DatePicker prefHeight="30.0" prefWidth="102.0" />
+                              <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="102.0" />
                            </children>
                         </HBox>
                      </children>
@@ -107,10 +107,11 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="100.0" text="Add meal" />
-                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Remove meal" />
+                  <Button mnemonicParsing="false" onAction="#handleMealRemoval" prefHeight="25.0" prefWidth="100.0" text="Remove meal" />
                </children>
             </HBox>
-            <Button mnemonicParsing="false" text="Add ingredient" onAction="#handleMealIngredientAdd" />
+            <Button mnemonicParsing="false" onAction="#handleMealIngredientAdd" text="Add ingredient" />
+            <Button mnemonicParsing="false" text="Remove Ingredient" onAction="#handleMealIngredientRemoval"/>
          </children>
       </HBox>
    </bottom>

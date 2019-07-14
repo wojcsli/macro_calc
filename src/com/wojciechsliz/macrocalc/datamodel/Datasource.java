@@ -38,6 +38,7 @@ public class Datasource {
 
 
 
+
     public static final String QUERY_INGREDIENTS = "SELECT * FROM " + TABLE_FOOD;
 
     public static final String QUERY_INGREDIENT = "SELECT * FROM " + TABLE_FOOD + " WHERE " + COLUMN_FOOD_NAME + "= ?";
@@ -47,7 +48,8 @@ public class Datasource {
     public static final String QUERY_MEAL_INGREDIENTS = "SELECT " + TABLE_FOOD + "." + COLUMN_FOOD_NAME + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_CARB + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_PROTEIN + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_FAT + ", " +
-            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_KCAL + " FROM " + TABLE_MEAL_INGREDIENT + " INNER JOIN " + TABLE_FOOD + " ON " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_KCAL + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + ", " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_MEAL_ID + " FROM " + TABLE_MEAL_INGREDIENT + " INNER JOIN " + TABLE_FOOD + " ON " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + " = " + TABLE_FOOD + "." + COLUMN_FOOD_ID + " WHERE " +
             COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ?";
 
@@ -57,24 +59,32 @@ public class Datasource {
             COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + ", " + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + COLUMN_MEAL_INGREDIENT_CARB + ", " +
             COLUMN_MEAL_INGREDIENT_PROTEIN + ", " + COLUMN_MEAL_INGREDIENT_FAT + ", " + COLUMN_MEAL_INGREDIENT_KCAL + ") VALUES (?, ?, ?, ?, ?, ?, ?)" ;
 
+    public static final String REMOVE_MEAL_STRING = "DELETE FROM " + TABLE_MEAL + " WHERE " + COLUMN_MEAL_ID + " = ?";
+
+    public static final String REMOVE_MEAL_INGREDIENT_STRING = "DELETE FROM " + TABLE_MEAL_INGREDIENT + " WHERE " + COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ? AND " + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + " = ?";
+
+    public static final String REMOVE_MEAL_INGREDIENTS_STRING = "DELETE FROM " + TABLE_MEAL_INGREDIENT + " WHERE " + COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ?";
+
     private Connection connection;
 
     private PreparedStatement addMealIngredientStatement;
     private PreparedStatement queryMealIngredients;
     private PreparedStatement addMealStatement;
     private PreparedStatement queryIngredientStatement;
+    private PreparedStatement removeMealStatement;
+    private PreparedStatement removeMealIngredientStatement;
+    private PreparedStatement removeMealIngredientsStatement;
 
     private static Datasource instance = new Datasource();
-
-    public static Datasource getInstance() {
-        return instance;
-    }
-
-
 
     private ObservableList<Meal> meals;
 
     private Datasource(){
+
+    }
+
+    public static Datasource getInstance() {
+        return instance;
     }
 
     public ObservableList<Meal> getMeals() {
@@ -88,6 +98,9 @@ public class Datasource {
             queryIngredientStatement = connection.prepareStatement(QUERY_INGREDIENT);
             addMealStatement = connection.prepareStatement(ADD_MEAL_STRING, Statement.RETURN_GENERATED_KEYS);
             addMealIngredientStatement = connection.prepareStatement(ADD_MEAL_INGREDIENT_STRING);
+            removeMealStatement = connection.prepareStatement(REMOVE_MEAL_STRING);
+            removeMealIngredientStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENT_STRING);
+            removeMealIngredientsStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENTS_STRING);
             meals = FXCollections.observableArrayList(queryMeals());
             return true;
         } catch (SQLException e) {
@@ -158,6 +171,8 @@ public class Datasource {
                 ingredient.setProtein(results.getDouble(COLUMN_MEAL_INGREDIENT_PROTEIN));
                 ingredient.setFat(results.getDouble(COLUMN_MEAL_INGREDIENT_FAT));
                 ingredient.setKcal(results.getDouble(COLUMN_MEAL_INGREDIENT_KCAL));
+                ingredient.setIngredientId(results.getInt(COLUMN_MEAL_INGREDIENT_INGREDIENT_ID));
+                ingredient.setMealId(results.getInt(COLUMN_MEAL_INGREDIENT_MEAL_ID));
                 ingredients.add(ingredient);
             }
             return ingredients;
@@ -184,25 +199,59 @@ public class Datasource {
         return false;
     }
 
-    public boolean addMealIngredient(Meal meal, Ingredient ingredient) {
+    public int addMealIngredient(Meal meal, Ingredient ingredient) {
 
         try {
             queryIngredientStatement.setString(1,ingredient.getName());
             ResultSet resultSet = queryIngredientStatement.executeQuery();
             addMealIngredientStatement.setString(1,String.valueOf(meal.getId()));
-            addMealIngredientStatement.setString(2,String.valueOf(resultSet.getInt(COLUMN_FOOD_ID)));
+            int ingredientID = resultSet.getInt(COLUMN_FOOD_ID);
+            addMealIngredientStatement.setString(2,String.valueOf(ingredientID));
             addMealIngredientStatement.setString(3,String.valueOf(ingredient.getWeight()));
             addMealIngredientStatement.setString(4,String.valueOf(resultSet.getDouble(COLUMN_FOOD_CARB)));
             addMealIngredientStatement.setString(5,String.valueOf(resultSet.getDouble(COLUMN_FOOD_PROTEIN)));
             addMealIngredientStatement.setString(6,String.valueOf(resultSet.getDouble(COLUMN_FOOD_FAT)));
             addMealIngredientStatement.setString(7,String.valueOf(resultSet.getDouble(COLUMN_FOOD_KCAL)));
-            addMealIngredientStatement.executeUpdate();
-            //String addIngredient = ("INSERT INTO " + TABLE_MEAL_INGREDIENT + " (meal_id, ingredient_id, weight, carb, protein, fat, kcal) VALUES (" + meal.getId() + ", 4, 20, 20, 20, 20, 200)");
-            return true;
+            if (!meal.lookForIngredientWithId(ingredientID)) {
+                addMealIngredientStatement.executeUpdate();
+            } else {
+                System.out.println("ingredient already exist");
+                return -1;
+            }
+
+            return 1;
             } catch (SQLException e1) {
                 e1.printStackTrace();
-                return false;
+                return -2;
             }
         }
+
+    public void removeMeal(Meal meal) {
+        try {
+            connection.setAutoCommit(false);
+            removeMealStatement.setString(1, String.valueOf(meal.getId()));
+            removeMealStatement.executeUpdate();
+            removeMealIngredientsStatement.setString(1, String .valueOf(meal.getId()));
+            removeMealIngredientsStatement.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
+            meals.remove(meal);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void removeMealIngredient(Meal meal, Ingredient ingredient) {
+        try {
+            removeMealIngredientStatement.setString(1, String.valueOf(meal.getId()));
+            removeMealIngredientStatement.setString(2, String.valueOf(ingredient.getIngredientId()));
+            removeMealIngredientStatement.executeUpdate();
+            //meal.removeIngredient(ingredient);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
 
