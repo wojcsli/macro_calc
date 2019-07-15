@@ -28,6 +28,12 @@ public class Controller {
     DatePicker datePicker;
 
     @FXML
+    Label totalDayLabel;
+
+    @FXML
+    Label totalMealLabel;
+
+    @FXML
     private TableView<Ingredient> mealIngredientsTable;
 
     @FXML
@@ -40,6 +46,8 @@ public class Controller {
                 GetAllMealsTask task = new GetAllMealsTask(newValue);
                 mealIngredientsTable.itemsProperty().bind(task.valueProperty());
                 new Thread(task).start();
+                totalMealLabel.textProperty().setValue(Datasource.getInstance().queryMealNutrients(newValue));
+                totalDayLabel.textProperty().setValue(Datasource.getInstance().queryDayNutrients(newValue.getDate()));
 
             }
         }
@@ -64,7 +72,7 @@ public class Controller {
 
     @FXML
     public void handleMealAdd() {
-        TextInputDialog dialog = new TextInputDialog("walter");
+        TextInputDialog dialog = new TextInputDialog("New meal");
         dialog.setTitle("New meal");
         dialog.setHeaderText("Enter description of your meal");
 

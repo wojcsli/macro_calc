@@ -18,7 +18,7 @@
 
 <BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
    <center>
-      <TableView fx:id="mealIngredientsTable" prefHeight="392.0" prefWidth="350.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="mealIngredientsTable" prefHeight="362.0" prefWidth="446.0" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="columnName" editable="false" prefWidth="165.0" text="Ingredient">
               <cellValueFactory>
@@ -54,7 +54,7 @@
       </TableView>
    </center>
    <left>
-      <ListView fx:id="mealList" prefHeight="200.0" prefWidth="192.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="mealList" prefHeight="356.0" prefWidth="214.0" BorderPane.alignment="CENTER" />
    </left>
    <top>
       <VBox prefHeight="56.0" prefWidth="463.0" BorderPane.alignment="CENTER">
@@ -78,22 +78,22 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <SplitPane dividerPositions="0.30173775671406006" prefHeight="38.0" prefWidth="540.0">
+            <SplitPane dividerPositions="0.334913112164297" prefHeight="38.0" prefWidth="540.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="29.0" prefWidth="202.0">
                      <children>
-                        <HBox layoutY="-1.0" prefHeight="47.0" prefWidth="188.0">
+                        <HBox layoutY="-1.0" prefHeight="47.0" prefWidth="210.0">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="&lt;--" onAction="#handlePreviousDayButton"/>
-                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="46.0" text="--&gt;" onAction="#handleNextDayButton"/>
-                              <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="102.0" onAction="#handleDateChange" />
+                              <Button mnemonicParsing="false" onAction="#handlePreviousDayButton" prefHeight="30.0" prefWidth="65.0" text="&lt;--" />
+                              <Button mnemonicParsing="false" onAction="#handleNextDayButton" prefHeight="30.0" prefWidth="69.0" text="--&gt;" />
+                              <DatePicker fx:id="datePicker" onAction="#handleDateChange" prefHeight="30.0" prefWidth="121.0" />
                            </children>
                         </HBox>
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="28.0" prefWidth="280.0">
                      <children>
-                        <Label maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="345.0" text="Label" />
+                        <Label layoutX="19.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="326.0" text="Label" />
                      </children>
                   </AnchorPane>
               </items>
@@ -102,16 +102,26 @@
       </VBox>
    </top>
    <bottom>
-      <HBox prefHeight="23.0" prefWidth="540.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="61.0" prefWidth="635.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <VBox prefHeight="57.0" prefWidth="635.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="100.0" text="Add meal" />
-                  <Button mnemonicParsing="false" onAction="#handleMealRemoval" prefHeight="25.0" prefWidth="100.0" text="Remove meal" />
+                  <HBox prefHeight="67.0" prefWidth="635.0">
+                     <children>
+                        <Label fx:id="totalDayLabel" prefHeight="54.0" prefWidth="279.0" text="Total Nutrients: " wrapText="true" />
+                        <Label fx:id="totalMealLabel" prefHeight="36.0" prefWidth="472.0" text="Total Nutrients: " wrapText="true" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="19.0" prefWidth="635.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="123.0" text="Add meal" />
+                        <Button mnemonicParsing="false" onAction="#handleMealRemoval" prefHeight="25.0" prefWidth="107.0" text="Remove meal" />
+                        <Button mnemonicParsing="false" onAction="#handleMealIngredientAdd" prefHeight="25.0" prefWidth="208.0" text="Add ingredient" />
+                        <Button mnemonicParsing="false" onAction="#handleMealIngredientRemoval" prefHeight="25.0" prefWidth="217.0" text="Remove Ingredient" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-            <Button mnemonicParsing="false" onAction="#handleMealIngredientAdd" text="Add ingredient" />
-            <Button mnemonicParsing="false" text="Remove Ingredient" onAction="#handleMealIngredientRemoval"/>
+            </VBox>
          </children>
       </HBox>
    </bottom>

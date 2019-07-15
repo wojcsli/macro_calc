@@ -131,7 +131,7 @@ public class Meal {
         this.kiloCalories.set(kiloCalories);
     }
 
-    private void updateWeight() {
+    public void updateWeight() {
         int totalWeight=0;
         for (Ingredient ingredient : ingredients) {
             totalWeight += ingredient.getWeight();
@@ -139,7 +139,7 @@ public class Meal {
         this.weight.set(totalWeight);
     }
 
-    private void updateFatContent() {
+    public void updateFatContent() {
         int totalFat=0;
         for (Ingredient ingredient : ingredients) {
             totalFat += ingredient.getFat();
@@ -147,7 +147,7 @@ public class Meal {
         this.fatContent.set(totalFat);
     }
 
-    private void updateProteinContent() {
+    public void updateProteinContent() {
         int totalProtein=0;
         for (Ingredient ingredient : ingredients) {
             totalProtein += ingredient.getProtein();
@@ -155,7 +155,7 @@ public class Meal {
         this.proteinContent.set(totalProtein);
     }
 
-    private void updateCarbs() {
+    public void updateCarbs() {
         int totalCarbs=0;
         for (Ingredient ingredient : ingredients) {
             totalCarbs += ingredient.getCarb();
@@ -163,7 +163,7 @@ public class Meal {
         this.carbohydrateContent.set(totalCarbs);
     }
 
-    private void updateCalories() {
+    public void updateCalories() {
         int totalKcal=0;
         for (Ingredient ingredient : ingredients) {
             totalKcal += ingredient.getKcal();

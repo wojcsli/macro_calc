@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,21 +39,34 @@ public class Datasource {
     public static final String COLUMN_MEAL_INGREDIENT_FAT = "fat";
     public static final String COLUMN_MEAL_INGREDIENT_KCAL = "kcal";
 
-    public static final String QUERY_INGREDIENTS = "SELECT * FROM " + TABLE_FOOD;
+    public static final String QUERY_INGREDIENTS_STRING = "SELECT * FROM " + TABLE_FOOD;
 
-    public static final String QUERY_INGREDIENT = "SELECT * FROM " + TABLE_FOOD + " WHERE " + COLUMN_FOOD_NAME + "= ?";
+    public static final String QUERY_INGREDIENT_STRING = "SELECT * FROM " + TABLE_FOOD + " WHERE " + COLUMN_FOOD_NAME + "= ?";
 
-    public static final String QUERY_MEALS = "SELECT * FROM " + TABLE_MEAL;
+    public static final String QUERY_MEALS_STRING = "SELECT * FROM " + TABLE_MEAL;
 
-    public static final String QUERY_MEALS_IN_DAY ="SELECT * FROM " + TABLE_MEAL + " WHERE " + COLUMN_MEAL_DAY + " = ?";
+    public static final String QUERY_MEAL_NUTRIENTS_STRING = "SELECT " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_CARB + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_PROTEIN + ", " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_FAT + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_KCAL +
+            " FROM " + TABLE_MEAL_INGREDIENT + " INNER JOIN " + TABLE_FOOD + " ON " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID +
+            " = " + TABLE_FOOD + "." + COLUMN_FOOD_ID + " WHERE " + COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ?";
 
-    public static final String QUERY_MEAL_INGREDIENTS = "SELECT " + TABLE_FOOD + "." + COLUMN_FOOD_NAME + ", " +
+    public static final String QUERY_MEALS_IN_DAY_STRING ="SELECT * FROM " + TABLE_MEAL + " WHERE " + COLUMN_MEAL_DAY + " = ?";
+
+    public static final String QUERY_MEAL_INGREDIENTS_STRING = "SELECT " + TABLE_FOOD + "." + COLUMN_FOOD_NAME + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_CARB + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_PROTEIN + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_FAT + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_KCAL + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + ", " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_MEAL_ID + " FROM " + TABLE_MEAL_INGREDIENT + " INNER JOIN " + TABLE_FOOD + " ON " +
             TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID + " = " + TABLE_FOOD + "." + COLUMN_FOOD_ID + " WHERE " +
             COLUMN_MEAL_INGREDIENT_MEAL_ID + " = ?";
+
+    public static final String QUERY_DAY_NUTRIENTS_STRING = "SELECT " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_WEIGHT + ", " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_CARB + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_PROTEIN + ", " +
+            TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_FAT + ", " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_KCAL +
+            " FROM " + TABLE_MEAL_INGREDIENT + " INNER JOIN " + TABLE_FOOD + " ON " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_INGREDIENT_ID +
+            " = " + TABLE_FOOD + "." + COLUMN_FOOD_ID + " INNER JOIN " + TABLE_MEAL + " ON " + TABLE_MEAL_INGREDIENT + "." + COLUMN_MEAL_INGREDIENT_MEAL_ID +
+            " = " + TABLE_MEAL + "." + COLUMN_MEAL_ID + " WHERE " + COLUMN_MEAL_DAY + " = ?";
 
     public static final String ADD_MEAL_STRING = "INSERT INTO " + TABLE_MEAL + " (" + COLUMN_MEAL_NAME + ", " + COLUMN_MEAL_DAY + ") VALUES (?, ?)";
 
@@ -76,6 +90,8 @@ public class Datasource {
     private PreparedStatement removeMealIngredientStatement;
     private PreparedStatement removeMealIngredientsStatement;
     private PreparedStatement queryMealInDayStatement;
+    private PreparedStatement queryMealNutrientsStatement;
+    private PreparedStatement queryDayNutrientsStatement;
 
     private static Datasource instance = new Datasource();
 
@@ -96,14 +112,16 @@ public class Datasource {
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
-            queryMealInDayStatement = connection.prepareStatement(QUERY_MEALS_IN_DAY);
-            queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS);
-            queryIngredientStatement = connection.prepareStatement(QUERY_INGREDIENT);
+            queryMealInDayStatement = connection.prepareStatement(QUERY_MEALS_IN_DAY_STRING);
+            queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS_STRING);
+            queryIngredientStatement = connection.prepareStatement(QUERY_INGREDIENT_STRING);
             addMealStatement = connection.prepareStatement(ADD_MEAL_STRING, Statement.RETURN_GENERATED_KEYS);
             addMealIngredientStatement = connection.prepareStatement(ADD_MEAL_INGREDIENT_STRING);
             removeMealStatement = connection.prepareStatement(REMOVE_MEAL_STRING);
             removeMealIngredientStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENT_STRING);
             removeMealIngredientsStatement = connection.prepareStatement(REMOVE_MEAL_INGREDIENTS_STRING);
+            queryMealNutrientsStatement = connection.prepareStatement(QUERY_MEAL_NUTRIENTS_STRING);
+            queryDayNutrientsStatement = connection.prepareStatement(QUERY_DAY_NUTRIENTS_STRING);
             meals = FXCollections.observableArrayList(queryMeals(LocalDate.now()));
             return true;
         } catch (SQLException e) {
@@ -144,7 +162,7 @@ public class Datasource {
     public List<Ingredient> queryIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
         try (Statement statement = connection.createStatement();
-             ResultSet results = statement.executeQuery(QUERY_INGREDIENTS)) {
+             ResultSet results = statement.executeQuery(QUERY_INGREDIENTS_STRING)) {
             while (results.next()) {
                 Ingredient ingredient = new Ingredient();
                 ingredient.setName(results.getString(COLUMN_FOOD_NAME));
@@ -251,12 +269,63 @@ public class Datasource {
         }
     }
 
+    public String queryDayNutrients(LocalDate date) {
+        double totalKcal =0;
+        double totalWeight = 0;
+        double totalCarb = 0;
+        double totalProtein = 0;
+        double totalFat = 0;
+        try {
+            queryDayNutrientsStatement.setString(1, date.toString());
+            ResultSet resultSet = queryDayNutrientsStatement.executeQuery();
+            while (resultSet.next()) {
+                totalWeight += resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT);
+                totalKcal += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_KCAL) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalCarb += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_CARB) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalProtein += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_PROTEIN) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalFat += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_FAT) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Total Nutrients: kcal: " + 0 + ", carb: " + 0 + ", protein: " + 0 + ", fat: " + 0;
+        }
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        return "Today's total nutrients:  kcal: " + decimalFormat.format(totalKcal) + ",\ncarb: " + decimalFormat.format(totalCarb) +
+                ", protein: " + decimalFormat.format(totalProtein) + ", fat: " + decimalFormat.format(totalFat);
+    }
+
+    public String queryMealNutrients(Meal meal) {
+        double totalKcal =0;
+        double totalWeight = 0;
+        double totalCarb = 0;
+        double totalProtein = 0;
+        double totalFat = 0;
+        try {
+            queryMealNutrientsStatement.setString(1, String.valueOf(meal.getId()));
+            ResultSet resultSet = queryMealNutrientsStatement.executeQuery();
+
+            while (resultSet.next()){
+                totalWeight += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT));
+                totalKcal += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_KCAL) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalCarb += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_CARB) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalProtein += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_PROTEIN) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+                totalFat += (resultSet.getDouble(COLUMN_MEAL_INGREDIENT_FAT) * resultSet.getDouble(COLUMN_MEAL_INGREDIENT_WEIGHT))/100;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Total Nutrients: kcal: " + 0 + ", carb: " + 0 + ", protein: " + 0 + ", fat: " + 0;
+        }
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        return "Total Nutrients: \n kcal: " + decimalFormat.format(totalKcal) + ", carb: " + decimalFormat.format(totalCarb) +
+                ", protein: " + decimalFormat.format(totalProtein) + ", fat: " + decimalFormat.format(totalFat);
+    }
+
     public void removeMealIngredient(Meal meal, Ingredient ingredient) {
         try {
             removeMealIngredientStatement.setString(1, String.valueOf(meal.getId()));
             removeMealIngredientStatement.setString(2, String.valueOf(ingredient.getIngredientId()));
             removeMealIngredientStatement.executeUpdate();
-            //meal.removeIngredient(ingredient);
 
         } catch (SQLException e) {
             e.printStackTrace();
