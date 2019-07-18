@@ -7,18 +7,17 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
+<BorderPane fx:id="mainBorderPane" prefHeight="473.0" prefWidth="648.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wojciechsliz.macrocalc.Controller">
    <center>
-      <TableView fx:id="mealIngredientsTable" prefHeight="362.0" prefWidth="446.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="mealIngredientsTable" prefHeight="356.0" prefWidth="433.0" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="columnName" editable="false" prefWidth="165.0" text="Ingredient">
               <cellValueFactory>
@@ -78,46 +77,36 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <SplitPane dividerPositions="0.334913112164297" prefHeight="38.0" prefWidth="540.0">
-              <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="29.0" prefWidth="202.0">
-                     <children>
-                        <HBox layoutY="-1.0" prefHeight="47.0" prefWidth="210.0">
-                           <children>
-                              <Button mnemonicParsing="false" onAction="#handlePreviousDayButton" prefHeight="30.0" prefWidth="65.0" text="&lt;--" />
-                              <Button mnemonicParsing="false" onAction="#handleNextDayButton" prefHeight="30.0" prefWidth="69.0" text="--&gt;" />
-                              <DatePicker fx:id="datePicker" onAction="#handleDateChange" prefHeight="30.0" prefWidth="121.0" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="28.0" prefWidth="280.0">
-                     <children>
-                        <Label layoutX="19.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="326.0" text="Label" />
-                     </children>
-                  </AnchorPane>
-              </items>
-            </SplitPane>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handlePreviousDayButton" prefHeight="30.0" prefWidth="46.0" text="&lt;--" />
+                  <Button mnemonicParsing="false" onAction="#handleNextDayButton" prefHeight="30.0" prefWidth="46.0" text="--&gt;" />
+                  <DatePicker fx:id="datePicker" onAction="#handleDateChange" prefHeight="30.0" prefWidth="121.0" />
+                  <Separator orientation="VERTICAL" prefHeight="31.0" prefWidth="6.0" />
+                  <Label fx:id="infoLabel" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="346.0" text="Nutrients in table below are per 100g" />
+               </children>
+            </HBox>
          </children>
       </VBox>
    </top>
    <bottom>
       <HBox prefHeight="61.0" prefWidth="635.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="57.0" prefWidth="635.0">
+            <VBox prefHeight="61.0" prefWidth="648.0">
                <children>
                   <HBox prefHeight="67.0" prefWidth="635.0">
                      <children>
-                        <Label fx:id="totalDayLabel" prefHeight="54.0" prefWidth="279.0" text="Total Nutrients: " wrapText="true" />
-                        <Label fx:id="totalMealLabel" prefHeight="36.0" prefWidth="472.0" text="Total Nutrients: " wrapText="true" />
+                        <Label fx:id="totalDayLabel" prefHeight="36.0" prefWidth="216.0" text="Total Nutrients: " wrapText="true" />
+                        <Separator orientation="VERTICAL" prefHeight="36.0" prefWidth="14.0" />
+                        <Label fx:id="totalMealLabel" prefHeight="36.0" prefWidth="433.0" text="Total Nutrients: " wrapText="true" />
                      </children>
                   </HBox>
-                  <HBox prefHeight="19.0" prefWidth="635.0">
+                  <HBox prefHeight="25.0" prefWidth="647.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="123.0" text="Add meal" />
-                        <Button mnemonicParsing="false" onAction="#handleMealRemoval" prefHeight="25.0" prefWidth="107.0" text="Remove meal" />
-                        <Button mnemonicParsing="false" onAction="#handleMealIngredientAdd" prefHeight="25.0" prefWidth="208.0" text="Add ingredient" />
-                        <Button mnemonicParsing="false" onAction="#handleMealIngredientRemoval" prefHeight="25.0" prefWidth="217.0" text="Remove Ingredient" />
+                        <Button mnemonicParsing="false" onAction="#handleMealAdd" prefHeight="25.0" prefWidth="116.0" text="Add meal" />
+                        <Button mnemonicParsing="false" onAction="#handleMealRemoval" prefHeight="25.0" prefWidth="116.0" text="Remove meal" />
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleMealIngredientAdd" prefHeight="25.0" prefWidth="225.0" text="Add ingredient" HBox.hgrow="ALWAYS" />
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleMealIngredientRemoval" prefHeight="25.0" prefWidth="225.0" text="Remove Ingredient" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                </children>

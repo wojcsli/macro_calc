@@ -3,6 +3,7 @@ package com.wojciechsliz.macrocalc;
 import com.wojciechsliz.macrocalc.datamodel.Datasource;
 import com.wojciechsliz.macrocalc.datamodel.Ingredient;
 import com.wojciechsliz.macrocalc.datamodel.Meal;
+import javafx.beans.property.ListProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -22,19 +24,21 @@ import java.util.Optional;
 public class Controller {
 
     @FXML
-    BorderPane mainBorderPane;
+    private BorderPane mainBorderPane;
 
     @FXML
-    DatePicker datePicker;
+    private DatePicker datePicker;
 
     @FXML
-    Label totalDayLabel;
+    private Label totalDayLabel;
 
     @FXML
-    Label totalMealLabel;
+    private Label totalMealLabel;
 
     @FXML
     private TableView<Ingredient> mealIngredientsTable;
+
+    private ObservableList<Ingredient> emptyMealList = FXCollections.observableArrayList();
 
     @FXML
     private ListView<Meal> mealList;
@@ -66,6 +70,14 @@ public class Controller {
         mealList.getSelectionModel().selectedItemProperty().removeListener(changeListener);
         mealList.getSelectionModel().selectedItemProperty().addListener(changeListener);
         mealList.setItems((ObservableList<Meal>) Datasource.getInstance().queryMeals(date));
+        if (mealList.getItems().isEmpty()) {
+            mealList.getSelectionModel().selectedItemProperty().removeListener(changeListener);
+            mealIngredientsTable.itemsProperty().unbind();
+            mealIngredientsTable.setItems(emptyMealList);
+            totalDayLabel.textProperty().setValue("Total Nutrients: kcal: " + 0 + ", \ncarb: " + 0 + ", protein: " + 0 + ", fat: " + 0);
+            totalMealLabel.textProperty().setValue("Total Nutrients: kcal: " + 0 + ", \ncarb: " + 0 + ", protein: " + 0 + ", fat: " + 0);
+
+        }
         mealList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         mealList.getSelectionModel().selectFirst();
     }

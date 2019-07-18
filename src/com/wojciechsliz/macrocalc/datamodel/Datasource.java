@@ -3,6 +3,7 @@ package com.wojciechsliz.macrocalc.datamodel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.net.URL;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -11,7 +12,8 @@ import java.util.List;
 
 public class Datasource {
     public static final String DB_NAME = "foods.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:D:\\Projekty\\MacroCalc\\" + DB_NAME;
+   // public static final String CONNECTION_STRING = "jdbc:sqlite:D:\\Projekty\\MacroCalc\\" + DB_NAME;
+    public static final String CONNECTION_STRING = "jdbc:sqlite:resources\\" + DB_NAME;
 
     public static final String TABLE_FOOD = "food";
     public static final String COLUMN_FOOD_ID = "_id";
@@ -111,6 +113,8 @@ public class Datasource {
 
     public boolean open() {
         try {
+            System.out.println(CONNECTION_STRING);
+
             connection = DriverManager.getConnection(CONNECTION_STRING);
             queryMealInDayStatement = connection.prepareStatement(QUERY_MEALS_IN_DAY_STRING);
             queryMealIngredients = connection.prepareStatement(QUERY_MEAL_INGREDIENTS_STRING);
